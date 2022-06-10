@@ -1,4 +1,5 @@
 // import PropTypes from 'prop-types';
+import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import styles from './ContactForm.module.css';
 
@@ -61,3 +62,7 @@ export default function ContactForm({ onSubmit }) {
     </>
   );
 }
+
+ContactForm.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+};
