@@ -1,25 +1,26 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { nanoid } from 'nanoid';
 
 import ContactForm from './ContactForm';
 import ContactList from './ContactList';
 import Filter from './Filter';
 
-class App extends Component {
-  state = {
-    contacts: [
-      { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-      { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-      { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-      { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-    ],
-    filter: '',
-  };
+const defaultContacts = [
+  { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
+  { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
+  { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
+  { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
+];
 
-  ContactFormHandler = data => {
+function App() {
+  const [contacts, setContacts] = useState(() => defaultContacts);
+  const [_filter, setFilter] = useState('');
+
+  const addContact = data => {
+    console.log(data);
     const { name, number } = data;
 
-    if (this.state.contacts.find(contact => contact.name === name)) {
+    if (contacts.find(contact => contact.name === name)) {
       alert(`${name} is already here`);
       return;
     }
@@ -29,66 +30,91 @@ class App extends Component {
       name,
       number,
     };
-    this.setState(prevState => {
-      return {
-        contacts: [newContact, ...prevState.contacts],
-      };
-    });
+
+    setContacts(prevState => [newContact, ...prevState]);
   };
 
-  deleteContact = contactId => {
-    this.setState(prevState => {
-      return {
-        contacts: prevState.contacts.filter(
-          contact => contact.id !== contactId,
-        ),
-      };
-    });
-  };
-
-  onChangeFilter = event => {
+  const onChangeFilter = event => {
     const { value } = event.target;
-    this.setState({ filter: value });
+    setFilter(value);
   };
 
-  getFilteredContacts = () => {
-    const { contacts, filter } = this.state;
-    const toLowerCaseFilter = filter.toLowerCase();
+  const deleteContact = contactId => {
+    setContacts(prevState => {
+      prevState.filter(contact => contact.id !== contactId);
+    });
+  };
+
+  const getFilteredContacts = () => {
+    const toLowerCaseFilter = _filter.toLowerCase();
     return contacts.filter(contact =>
       contact.name.toLowerCase().includes(toLowerCaseFilter),
     );
   };
 
-  componentDidMount() {
-    const savedContacts = JSON.parse(localStorage.getItem('contacts'));
-    if (savedContacts) {
-      this.setState({ contacts: savedContacts });
-    }
-  }
+  const filteredContacts = getFilteredContacts();
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.contacts !== this.state.contacts) {
-      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
-    }
-  }
+  return (
+    <div style={{ marginLeft: '30px' }}>
+      <h1> Phonebook </h1>
+      <ContactForm onSubmit={addContact} />
 
-  render() {
-    const { filter } = this.state;
-    const filteredContacts = this.getFilteredContacts();
-
-    return (
-      <div style={{ marginLeft: '30px' }}>
-        <h1> Phonebook </h1>
-        <ContactForm onSubmit={this.ContactFormHandler} />
-        <h1> Contacts </h1>
-        <Filter onChange={this.onChangeFilter} value={filter} />
-        <ContactList
-          contactList={filteredContacts}
-          onDelete={this.deleteContact}
-        />
-      </div>
-    );
-  }
+      <h1> Contacts </h1>
+      <Filter onChange={onChangeFilter} value={_filter} />
+      <ContactList contactList={filteredContacts} onDelete={deleteContact} />
+    </div>
+  );
 }
 
 export { App };
+
+// class App1 extends Component {
+//   state = {
+//     contacts: [
+//       { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
+//       { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
+//       { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
+//       { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
+//     ],
+//     filter: '',
+//   };
+
+//   getFilteredContacts = () => {
+//     const { contacts, filter } = this.state;
+//     const toLowerCaseFilter = filter.toLowerCase();
+//     return contacts.filter(contact =>
+//       contact.name.toLowerCase().includes(toLowerCaseFilter),
+//     );
+//   };
+
+//   componentDidMount() {
+//     const savedContacts = JSON.parse(localStorage.getItem('contacts'));
+//     if (savedContacts) {
+//       this.setState({ contacts: savedContacts });
+//     }
+//   }
+
+//   componentDidUpdate(prevProps, prevState) {
+//     if (prevState.contacts !== this.state.contacts) {
+//       localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
+//     }
+//   }
+// }
+
+//   render() {
+//     const { filter } = this.state;
+//     const filteredContacts = this.getFilteredContacts();
+
+//   //   return (
+//   //     <div style={{ marginLeft: '30px' }}>
+//   //       <h1> Phonebook </h1>
+//   //       <ContactForm onSubmit={this.ContactFormHandler} />
+//   //       <h1> Contacts </h1>
+//   //       <Filter onChange={this.onChangeFilter} value={filter} />
+//   //       <ContactList
+//   //         contactList={filteredContacts}
+//   //         onDelete={this.deleteContact}
+//   //       />
+//   //     </div>
+//   //   );
+//   // }
